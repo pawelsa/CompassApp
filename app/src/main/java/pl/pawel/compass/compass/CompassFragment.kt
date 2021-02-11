@@ -3,7 +3,6 @@ package pl.pawel.compass.compass
 import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,8 +35,13 @@ class CompassFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+//        val first = Localization(49.98303370984737f, 18.94222131835939f)
+//        val second = Localization(52.23451767851094f, 21.011770878906265f)
+//        val angle = CalculateBearing.getDegree(first, second)
+
         viewModel.rotation.observe(viewLifecycleOwner) {
-            Log.d("CompassFragment", "onViewCreated: rotation: $it")
+//            Log.d("CompassFragment", "onViewCreated: rotation: $it")
             view.findViewById<TextView>(R.id.message).rotation = -it
         }
     }
