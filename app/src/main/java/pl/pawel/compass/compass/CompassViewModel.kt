@@ -9,6 +9,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CompassViewModel @Inject constructor() : ViewModel() {
 
+    var shouldShowDialogToChooseDestination: Boolean = false
+    var shouldStartGettingLocalization: Boolean = false
     private var _rotation = MutableLiveData<Float>()
     val rotation: LiveData<Float> = _rotation
 
