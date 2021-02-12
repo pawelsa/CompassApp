@@ -7,10 +7,6 @@ import android.hardware.SensorManager
 import kotlin.math.abs
 
 class CompassListener(private val updateDegrees: (Float) -> Unit) : SensorEventListener {
-    companion object {
-        private const val DEGREE_THRESHOLD = 2
-    }
-
     private var rotationMatrix = FloatArray(16)
     private var inclinationMatrix = FloatArray(16)
     private var gravityVector = FloatArray(3)
@@ -18,6 +14,10 @@ class CompassListener(private val updateDegrees: (Float) -> Unit) : SensorEventL
     private var orientationVector = FloatArray(3)
 
     private var degrees = 0f
+
+    companion object {
+        private const val DEGREE_THRESHOLD = 2
+    }
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (isEventAndAccuracyNotGoodEnough(event)) return

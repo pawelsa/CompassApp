@@ -3,4 +3,7 @@
     <string name="enable_gps">Enable GPS</string>
     <string name="required_for_this_app">GPS is required for this functionality</string>
     <string name="enable_now">Enable now</string>
+    <string name="gps_required">GPS is required for this functionality to work</string>
+    <string name="location_permission_is_required">Location permission is required for this function</string>
+    <string name="settings">Settings</string>
 </resources>

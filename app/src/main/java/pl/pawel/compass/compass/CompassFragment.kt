@@ -1,14 +1,11 @@
 package pl.pawel.compass.compass
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
-import android.hardware.Sensor
 import android.hardware.SensorManager
+import android.net.Uri
 import android.os.Bundle
-import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +16,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import pl.pawel.compass.R
-import pl.pawel.compass.data.Location
 import pl.pawel.compass.databinding.CompassFragmentBinding
-import pl.pawel.compass.utils.CalculateBearing
 import pl.pawel.compass.utils.PermissionUtils
+import pl.pawel.compass.utils.haveCompassRequiredSensors
+import pl.pawel.compass.utils.registerCompassListener
 
 class CompassFragment : Fragment() {
     private lateinit var binding: CompassFragmentBinding
@@ -38,6 +34,11 @@ class CompassFragment : Fragment() {
             viewModel.updateRotation(rotation)
         }
     }
+    private val locationListener: LocationListener by lazy {
+        LocationListener(activity as AppCompatActivity) {
+            viewModel.updateLocation(it)
+        }
+    }
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -46,15 +47,21 @@ class CompassFragment : Fragment() {
             if (isGranted) {
                 setupLocalizationIfTurnedOnOrAskToEnable()
             } else {
-                Snackbar.make(
-                    requireView(),
-                    "This permission is required for this function",
-                    Snackbar.LENGTH_LONG
-                ).setAction("Settings") {
-                    startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                }.show()
+                showSnackbarToOpenSettings()
             }
         }
+
+    private fun showSnackbarToOpenSettings() {
+        Snackbar.make(
+            requireView(),
+            getString(R.string.location_permission_is_required),
+            Snackbar.LENGTH_LONG
+        ).setAction(getString(R.string.settings)) {
+            startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", requireContext().packageName, null)
+            })
+        }.show()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -72,7 +79,6 @@ class CompassFragment : Fragment() {
 //        val angle = CalculateBearing.getDegree(first, second)
 
         viewModel.rotation.observe(viewLifecycleOwner) {
-//            Log.d("CompassFragment", "onViewCreated: rotation: $it")
             view.findViewById<TextView>(R.id.message).rotation = -it
         }
         view.findViewById<TextView>(R.id.message).setOnClickListener {
@@ -87,111 +93,56 @@ class CompassFragment : Fragment() {
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
         if (PermissionUtils.isLocationEnabled(requireContext())) {
             setUpLocationListener()
-            Toast.makeText(
-                requireContext(),
-                "Now I should ask you to select destination",
-                Toast.LENGTH_SHORT
-            ).show()
+            showDialogToSelectDestination()
         } else {
             viewModel.shouldStartGettingLocalization = true
-            viewModel.shouldShowDialogToChooseDestination = true
-            PermissionUtils.showGPSNotEnabledDialog(requireContext())
+            PermissionUtils.showEnableGPSDialog(requireContext())
         }
+    }
+
+    private fun setUpLocationListener() {
+        locationListener.startObservingLocation(
+            activity as AppCompatActivity,
+            onError = {
+                showSnackbarThatAppRequiresGpsToWork()
+            })
     }
 
     override fun onResume() {
         super.onResume()
-        if (haveCompassRequiredSensors()) {
-            registerCompassListener()
+        if (sensorManager.haveCompassRequiredSensors()) {
+            sensorManager.registerCompassListener(compassListener)
         }
         if (viewModel.shouldStartGettingLocalization) {
             if (PermissionUtils.isLocationEnabled(requireContext())) {
                 setUpLocationListener()
-                if (viewModel.shouldShowDialogToChooseDestination) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Now I should ask you to select destination",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                showDialogToSelectDestination()
             } else {
-                showSnackbarThatRequiresGpsForAppToWork()
+                showSnackbarThatAppRequiresGpsToWork()
             }
         }
+    }
+
+    private fun showDialogToSelectDestination() {
+        Toast.makeText(
+            requireContext(),
+            "Now I should ask you to select destination",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onPause() {
         sensorManager.unregisterListener(compassListener)
+        if (viewModel.shouldStartGettingLocalization) {
+            locationListener.stopObtainingLocation()
+        }
         super.onPause()
     }
 
-    private fun registerCompassListener() {
-        sensorManager.apply {
-            registerListener(
-                compassListener, getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                SensorManager.SENSOR_DELAY_NORMAL
-            )
-            registerListener(
-                compassListener, getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
-                SensorManager.SENSOR_DELAY_NORMAL
-            )
-        }
-    }
-
-    private fun haveCompassRequiredSensors(): Boolean {
-        val compassSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
-        val accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        return compassSensor != null && accelerometerSensor != null
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun setUpLocationListener() {
-        val fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(activity as AppCompatActivity)
-        val locationRequest = LocationRequest().setInterval(5000).setFastestInterval(2000)
-            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-
-        val locationRequestBuilder =
-            LocationSettingsRequest.Builder()
-                .addLocationRequest(locationRequest)
-                .setAlwaysShow(true)
-
-        LocationServices.getSettingsClient(activity as AppCompatActivity)
-            .checkLocationSettings(locationRequestBuilder.build())
-            .addOnSuccessListener {
-                fusedLocationProviderClient.requestLocationUpdates(
-                    locationRequest,
-                    object : LocationCallback() {
-                        override fun onLocationResult(locationResult: LocationResult) {
-                            super.onLocationResult(locationResult)
-                            for (location in locationResult.locations) {
-                                Log.d(
-                                    "CompassFragment",
-                                    "onLocationResult: ${location.latitude}, ${location.longitude}"
-                                )
-                                val second = Location(52.23451767851094f, 21.011770878906265f)
-                                val angle = CalculateBearing.getDegree(
-                                    Location(
-                                        location.latitude.toFloat(),
-                                        location.longitude.toFloat()
-                                    ), second
-                                )
-                                Log.d("CompassFragment", "onLocationResult: angle: $angle")
-                            }
-                        }
-                    },
-                    Looper.myLooper()
-                )
-            }.addOnFailureListener {
-                showSnackbarThatRequiresGpsForAppToWork()
-            }
-
-    }
-
-    private fun showSnackbarThatRequiresGpsForAppToWork() {
+    private fun showSnackbarThatAppRequiresGpsToWork() {
         Snackbar.make(
             requireView(),
-            "GPS is required for this functionality to work",
+            getString(R.string.gps_required),
             Snackbar.LENGTH_LONG
         ).show()
     }
