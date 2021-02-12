@@ -9,7 +9,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -36,7 +35,7 @@ class CompassFragment : Fragment() {
     }
     private val locationListener: LocationListener by lazy {
         LocationListener(activity as AppCompatActivity) {
-            viewModel.updateLocation(it)
+            viewModel.updateMyLocation(it)
         }
     }
 
@@ -74,20 +73,31 @@ class CompassFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        val first = Localization(49.98303370984737f, 18.94222131835939f)
-//        val second = Localization(52.23451767851094f, 21.011770878906265f)
-//        val angle = CalculateBearing.getDegree(first, second)
+        viewModel.state.observe(viewLifecycleOwner, ::handleStateUpdate)
 
-        viewModel.rotation.observe(viewLifecycleOwner) {
-            view.findViewById<TextView>(R.id.message).rotation = -it
-        }
-        view.findViewById<TextView>(R.id.message).setOnClickListener {
+        binding.message.setOnClickListener {
             if (PermissionUtils.isAccessFineLocationGranted(requireContext())) {
                 setupLocalizationIfTurnedOnOrAskToEnable()
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             }
         }
+    }
+
+    private fun handleStateUpdate(state: CompassState) = when (state) {
+        is CompassState.OnlyCompass -> updateCompassRotation(state.bearing)
+        is CompassState.CompassWithLocalizationState -> updateCompassWithLocalization(state)
+    }
+
+    private fun updateCompassWithLocalization(state: CompassState.CompassWithLocalizationState) =
+        with(binding) {
+            ivNorth.rotation = state.bearing
+            ivDest.rotation = state.bearingOfDestination
+            message.text = "Distance: ${state.distanceToDestination}"
+        }
+
+    private fun updateCompassRotation(bearing: Float) = with(binding) {
+        ivNorth.rotation = bearing
     }
 
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
