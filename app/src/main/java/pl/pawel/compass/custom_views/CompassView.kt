@@ -32,7 +32,7 @@ class CompassView @JvmOverloads constructor(
     }
     private val compassTextPaint by lazy {
         TextPaint().apply {
-            textSize = 40f
+            textSize = 60f
             typeface = Typeface.DEFAULT_BOLD
             isAntiAlias = true
             color = ContextCompat.getColor(context, R.color.green_500)
@@ -47,7 +47,7 @@ class CompassView @JvmOverloads constructor(
     }
     private val destinationTextPaint by lazy {
         TextPaint().apply {
-            textSize = 40f
+            textSize = 60f
             typeface = Typeface.DEFAULT_BOLD
             isAntiAlias = true
             color = ContextCompat.getColor(context, android.R.color.holo_red_light)
@@ -59,7 +59,7 @@ class CompassView @JvmOverloads constructor(
         smallerDim / 2f
     }
     private val distanceForLetterFromCenter by lazy {
-        val smallerDim = min(height, width) * 0.75f
+        val smallerDim = min(height, width) * 0.79f
         smallerDim / 2f
     }
 
