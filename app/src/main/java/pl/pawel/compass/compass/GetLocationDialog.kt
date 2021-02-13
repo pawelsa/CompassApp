@@ -65,7 +65,7 @@ object GetLocationDialog {
         borderValue: Float
     ) {
         val text = this.editText?.text
-        val longitude = text?.toString()?.toFloat()
+        val longitude = text?.toString()?.toFloatOrNull()
         error = when {
             text?.isEmpty() == true -> context.getString(R.string.error_empty_field)
             longitude == null || longitude.absoluteValue > borderValue -> {

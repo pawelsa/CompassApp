@@ -19,6 +19,7 @@ import pl.pawel.compass.R
 import pl.pawel.compass.compass.GetLocationDialog.showDialogToSelectDestination
 import pl.pawel.compass.databinding.CompassFragmentBinding
 import pl.pawel.compass.utils.PermissionUtils
+import pl.pawel.compass.utils.distanceToString
 import pl.pawel.compass.utils.haveCompassRequiredSensors
 import pl.pawel.compass.utils.registerCompassListener
 
@@ -93,7 +94,7 @@ class CompassFragment : Fragment() {
         with(binding) {
             ivNorth.rotation = state.bearing
             ivDest.rotation = state.bearingOfDestination
-            message.text = "Distance: ${state.distanceToDestination}"
+            message.text = "Distance\nleft\n" + state.distanceToDestination.distanceToString()
         }
 
     private fun updateCompassRotation(bearing: Float) = with(binding) {

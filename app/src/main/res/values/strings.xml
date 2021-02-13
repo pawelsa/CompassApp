@@ -11,4 +11,5 @@
     <string name="dialog_field_longitude">Longitude</string>
     <string name="error_empty_field">Field cannot be empty</string>
     <string name="error_value_between">Value should be between -%1$f, %1$f</string>
+    <string name="distance_left">Distance\nleft\n%1$s</string>
 </resources>
