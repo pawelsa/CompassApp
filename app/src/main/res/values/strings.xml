@@ -12,4 +12,5 @@
     <string name="error_empty_field">Field cannot be empty</string>
     <string name="error_value_between">Value should be between -%1$f, %1$f</string>
     <string name="distance_left">Distance\nleft\n%1$s</string>
+    <string name="what_is_your_goal">What\nis your\ngoal?</string>
 </resources>

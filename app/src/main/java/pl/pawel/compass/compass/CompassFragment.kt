@@ -92,13 +92,16 @@ class CompassFragment : Fragment() {
 
     private fun updateCompassWithLocalization(state: CompassState.CompassWithLocalizationState) =
         with(binding) {
-            ivNorth.rotation = state.bearing
-            ivDest.rotation = state.bearingOfDestination
-            message.text = "Distance\nleft\n" + state.distanceToDestination.distanceToString()
+//            ivNorth.rotation = state.bearing
+//            ivDest.rotation = state.bearingOfDestination
+            message.text = resources.getString(
+                R.string.distance_left,
+                state.distanceToDestination.distanceToString()
+            )
         }
 
     private fun updateCompassRotation(bearing: Float) = with(binding) {
-        ivNorth.rotation = bearing
+//        ivNorth.rotation = bearing
     }
 
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
