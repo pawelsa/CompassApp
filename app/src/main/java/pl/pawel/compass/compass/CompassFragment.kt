@@ -9,7 +9,6 @@ import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
@@ -17,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import pl.pawel.compass.R
+import pl.pawel.compass.compass.GetLocationDialog.showDialogToSelectDestination
 import pl.pawel.compass.databinding.CompassFragmentBinding
 import pl.pawel.compass.utils.PermissionUtils
 import pl.pawel.compass.utils.haveCompassRequiredSensors
@@ -103,7 +103,7 @@ class CompassFragment : Fragment() {
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
         if (PermissionUtils.isLocationEnabled(requireContext())) {
             setUpLocationListener()
-            showDialogToSelectDestination()
+            showDialogToSelectDestination(layoutInflater, viewModel::updateDestination)
         } else {
             viewModel.shouldStartGettingLocalization = true
             PermissionUtils.showEnableGPSDialog(requireContext())
@@ -124,22 +124,10 @@ class CompassFragment : Fragment() {
             sensorManager.registerCompassListener(compassListener)
         }
         if (viewModel.shouldStartGettingLocalization) {
-            if (PermissionUtils.isLocationEnabled(requireContext())) {
-                setUpLocationListener()
-                showDialogToSelectDestination()
-            } else {
-                showSnackbarThatAppRequiresGpsToWork()
-            }
+            setupLocalizationIfTurnedOnOrAskToEnable()
         }
     }
 
-    private fun showDialogToSelectDestination() {
-        Toast.makeText(
-            requireContext(),
-            "Now I should ask you to select destination",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
 
     override fun onPause() {
         sensorManager.unregisterListener(compassListener)
