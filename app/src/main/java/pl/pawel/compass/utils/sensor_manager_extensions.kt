@@ -2,7 +2,7 @@ package pl.pawel.compass.utils
 
 import android.hardware.Sensor
 import android.hardware.SensorManager
-import pl.pawel.compass.compass.CompassListener
+import pl.pawel.compass.screen.compass.CompassListener
 
 
 fun SensorManager.haveCompassRequiredSensors(): Boolean {

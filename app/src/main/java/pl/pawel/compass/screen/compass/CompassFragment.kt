@@ -1,4 +1,4 @@
-package pl.pawel.compass.compass
+package pl.pawel.compass.screen.compass
 
 import android.Manifest
 import android.content.Intent
@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import pl.pawel.compass.R
-import pl.pawel.compass.compass.GetLocationDialog.showDialogToSelectDestination
 import pl.pawel.compass.databinding.CompassFragmentBinding
+import pl.pawel.compass.screen.compass.GetLocationDialog.showDialogToSelectDestination
 import pl.pawel.compass.utils.PermissionUtils
 import pl.pawel.compass.utils.distanceToString
 import pl.pawel.compass.utils.haveCompassRequiredSensors

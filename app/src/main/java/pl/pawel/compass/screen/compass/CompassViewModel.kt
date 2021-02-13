@@ -1,4 +1,4 @@
-package pl.pawel.compass.compass
+package pl.pawel.compass.screen.compass
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
