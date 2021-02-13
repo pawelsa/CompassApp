@@ -27,13 +27,16 @@ object PermissionUtils {
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
 
-    fun showEnableGPSDialog(context: Context) {
+    fun showEnableGPSDialog(context: Context, onCancel: () -> Unit) {
         AlertDialog.Builder(context)
             .setTitle(context.getString(R.string.enable_gps))
             .setMessage(context.getString(R.string.required_for_this_app))
-            .setCancelable(false)
+            .setCancelable(true)
             .setPositiveButton(context.getString(R.string.enable_now)) { _, _ ->
                 context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setOnCancelListener {
+                onCancel()
             }
             .show()
     }

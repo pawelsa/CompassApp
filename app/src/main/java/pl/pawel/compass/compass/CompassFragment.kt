@@ -74,7 +74,7 @@ class CompassFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.state.observe(viewLifecycleOwner, ::handleStateUpdate)
+        viewModel.state.observe(viewLifecycleOwner, { handleStateUpdate(it) })
 
         binding.message.setOnClickListener {
             if (PermissionUtils.isAccessFineLocationGranted(requireContext())) {
@@ -85,23 +85,25 @@ class CompassFragment : Fragment() {
         }
     }
 
-    private fun handleStateUpdate(state: CompassState) = when (state) {
-        is CompassState.OnlyCompass -> updateCompassRotation(state.bearing)
-        is CompassState.CompassWithLocalizationState -> updateCompassWithLocalization(state)
+    private fun handleStateUpdate(state: CompassState) {
+        return when (state) {
+            is CompassState.OnlyCompass -> updateCompassRotation(state.bearing)
+            is CompassState.CompassWithLocalizationState -> updateCompassWithLocalization(state)
+        }
     }
 
     private fun updateCompassWithLocalization(state: CompassState.CompassWithLocalizationState) =
         with(binding) {
-//            ivNorth.rotation = state.bearing
-//            ivDest.rotation = state.bearingOfDestination
             message.text = resources.getString(
                 R.string.distance_left,
                 state.distanceToDestination.distanceToString()
             )
+            compassView.northAngle = state.bearing
+            compassView.destinationAngle = state.bearingOfDestination
         }
 
     private fun updateCompassRotation(bearing: Float) = with(binding) {
-//        ivNorth.rotation = bearing
+        compassView.northAngle = bearing
     }
 
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
@@ -110,7 +112,9 @@ class CompassFragment : Fragment() {
             showDialogToSelectDestination(layoutInflater, viewModel::updateDestination)
         } else {
             viewModel.shouldStartGettingLocalization = true
-            PermissionUtils.showEnableGPSDialog(requireContext())
+            PermissionUtils.showEnableGPSDialog(requireContext()) {
+                viewModel.shouldStartGettingLocalization = false
+            }
         }
     }
 
@@ -144,7 +148,7 @@ class CompassFragment : Fragment() {
     private fun showSnackbarThatAppRequiresGpsToWork() {
         Snackbar.make(
             requireView(),
-            getString(R.string.gps_required),
+            getString(R.string.required_for_this_app),
             Snackbar.LENGTH_LONG
         ).show()
     }

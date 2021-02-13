@@ -3,7 +3,6 @@
     <string name="enable_gps">Enable GPS</string>
     <string name="required_for_this_app">GPS is required for this functionality</string>
     <string name="enable_now">Enable now</string>
-    <string name="gps_required">GPS is required for this functionality to work</string>
     <string name="location_permission_is_required">Location permission is required for this function</string>
     <string name="settings">Settings</string>
     <string name="enter_location">Enter location</string>
@@ -11,6 +10,6 @@
     <string name="dialog_field_longitude">Longitude</string>
     <string name="error_empty_field">Field cannot be empty</string>
     <string name="error_value_between">Value should be between -%1$f, %1$f</string>
-    <string name="distance_left">Distance\nleft\n%1$s</string>
+    <string name="distance_left">Distance left %1$s</string>
     <string name="what_is_your_goal">What\nis your\ngoal?</string>
 </resources>

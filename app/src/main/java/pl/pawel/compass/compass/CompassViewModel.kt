@@ -1,6 +1,5 @@
 package pl.pawel.compass.compass
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,7 +17,7 @@ class CompassViewModel @Inject constructor() : ViewModel() {
 
     private var bearing: Float = 0f
     private var myLocation: Location? = null
-    private var destination: Location? = null //= Location(52.23451767851094f, 21.011770878906265f)
+    private var destination: Location? = null
 
     fun updateRotation(rotation: Float) {
         bearing = -rotation
@@ -32,7 +31,6 @@ class CompassViewModel @Inject constructor() : ViewModel() {
 
     fun updateDestination(destination: Location) {
         this.destination = destination
-        Log.d("CompassViewModel", "updateDestination: destination: $destination")
         updateData()
     }
 
@@ -43,7 +41,6 @@ class CompassViewModel @Inject constructor() : ViewModel() {
             val angle = GeographicCalculations.getDegree(myLocation!!, destination!!)
             val destinationAngle = angle + bearing
             val distance = GeographicCalculations.getDistance(myLocation!!, destination!!)
-            Log.d("CompassViewModel", "updateData: angle: $angle")
             _state.value =
                 CompassState.CompassWithLocalizationState(bearing, destinationAngle, distance)
         }

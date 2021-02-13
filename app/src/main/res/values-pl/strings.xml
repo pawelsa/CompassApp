@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kompas</string>
+    <string name="enable_gps">Włącz GPS</string>
+    <string name="required_for_this_app">GPS jest konieczny do tej funkcji</string>
+    <string name="enable_now">Włącz teraz</string>
+    <string name="location_permission_is_required">Pozwolenie na lokalizację jest wymagane</string>
+    <string name="settings">Ustawienia</string>
+    <string name="enter_location">Wprowadź lokalizację</string>
+    <string name="error_empty_field">Pole nie może być puste</string>
+    <string name="error_value_between">Wartość powinna być pomiędzy -%1$f, %1$f</string>
+    <string name="distance_left">Pozostały\ndystans\n %1$s</string>
+    <string name="what_is_your_goal">Jaki\njest twój\ncel?</string>
+    <string name="dialog_field_latitude">Szerokość geograficzna</string>
+    <string name="dialog_field_longitude">Długość geograficzna</string>
+</resources>

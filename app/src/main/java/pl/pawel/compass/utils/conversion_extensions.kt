@@ -7,3 +7,7 @@ fun Double.distanceToString(): String = when {
 }
 
 private fun Double.format(digits: Int): String = "%.${digits}f".format(this)
+
+fun Float.toRadians(): Float = (this * (Math.PI / 180)).toFloat()
+
+fun Float.toDegrees(): Float = (this * (180 / Math.PI)).toFloat()

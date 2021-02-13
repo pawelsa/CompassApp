@@ -43,12 +43,4 @@ object GeographicCalculations {
         return earthRadius * c
     }
 
-    private fun Float.toRadians(): Float {
-        return (this * (Math.PI / 180)).toFloat()
-    }
-
-    private fun Float.toDegrees(): Float {
-        return (this * (180 / Math.PI)).toFloat()
-    }
-
 }
