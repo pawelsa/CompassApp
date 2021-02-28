@@ -7,9 +7,7 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.data.use_case.ObserveLocationUseCase
 import pl.pawel.compass.utils.NotificationUtil.createLocationChannel
@@ -41,14 +39,12 @@ class LocationService : Service() {
     }
 
     private fun setupOnBind() {
-        Log.d("LocationService", "setupOnBind: ")
         stopForeground(true)
         setupObservingLocation()
         changingConfiguration = false
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.d("LocationService", "onUnbind: ")
         if (!changingConfiguration && locationDisposable?.isDisposed == false) {
             startLocationForeground(currentLocation)
         }
@@ -61,30 +57,29 @@ class LocationService : Service() {
     }
 
     override fun onCreate() {
-        Log.d("LocationService", "onCreate: ")
+        super.onCreate()
         notificationManager.createLocationChannel(applicationContext)
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("LocationService", "onStartCommand: ${intent?.action ?: ""}")
-        when (intent?.action) {
-            START_OBTAINING_LOCATION -> setupObservingLocation()
-            STOP_OBSERVING_LOCATION -> stopObservingLocation()
-        }
-        return START_NOT_STICKY
     }
 
     private fun setupObservingLocation() {
         Log.d("LocationService", "setupObservingLocation: ")
         locationDisposable = locationUseCase()
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe {
+                Log.d("LocationService", "setupObservingLocation: onSubscribe")
+            }
             .subscribe({
+                Log.d("LocationService", "setupObservingLocation: $it")
                 currentLocation = it
                 RxBus.publish(it)
             }, {
+                Log.d("LocationService", "setupObservingLocation: $it")
                 setupObservingLocation()
             })
+    }
+
+    override fun onDestroy() {
+        stopObservingLocation()
+        super.onDestroy()
     }
 
     private fun stopObservingLocation() {
@@ -94,10 +89,4 @@ class LocationService : Service() {
     inner class LocationBinder : Binder() {
         val service: LocationService = this@LocationService
     }
-
-    companion object {
-        val STOP_OBSERVING_LOCATION = LocationService::class.java.name + "stop_observing"
-        val START_OBTAINING_LOCATION = LocationService::class.java.name + "start_observing"
-    }
-
 }

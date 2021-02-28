@@ -9,7 +9,7 @@ interface LocationRepository {
     fun obtainLocation(): Flowable<Location>
 }
 
-class LocationRepositoryImpl @Inject constructor(private val locationObserver: LocationObserver) :
+class LocationRepositoryImpl @Inject constructor(val locationObserver: LocationObserver) :
     LocationRepository {
     override fun obtainLocation(): Flowable<Location> = locationObserver.locationObservable
 }

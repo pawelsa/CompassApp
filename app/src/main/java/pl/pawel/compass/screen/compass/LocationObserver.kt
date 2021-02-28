@@ -9,6 +9,7 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import io.reactivex.rxjava3.core.BackpressureStrategy
 import io.reactivex.rxjava3.core.Flowable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.utils.toAppLocation
@@ -34,6 +35,7 @@ class LocationObserver @Inject constructor(
 
     val locationObservable: Flowable<Location> =
         locationSubject.toFlowable(BackpressureStrategy.LATEST)
+            .observeOn(Schedulers.io())
             .doOnSubscribe { startObtainingLocalization() }
             .doOnCancel { stopObtainingLocation() }
 
