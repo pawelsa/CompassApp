@@ -4,7 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jraska.livedata.test
 import org.junit.Rule
 import org.junit.Test
-import pl.pawel.compass.data.Location
+import pl.pawel.compass.data.model.Location
 
 class CompassViewModelTest {
 

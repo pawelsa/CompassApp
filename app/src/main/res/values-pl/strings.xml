@@ -13,4 +13,8 @@
     <string name="what_is_your_goal">Jaki\njest twój\ncel?</string>
     <string name="dialog_field_latitude">Szerokość geograficzna</string>
     <string name="dialog_field_longitude">Długość geograficzna</string>
+    <string name="launch_activity">Otwórz aplikację</string>
+    <string name="your_location">Twoja lokalizacja</string>
+    <string name="current_location">Aktualnie: %1$f, %2$f</string>
+    <string name="establishing_location">Ustalanie pozycji</string>
 </resources>

@@ -1,28 +1,34 @@
 package pl.pawel.compass.screen.compass
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.IBinder
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import pl.pawel.compass.R
 import pl.pawel.compass.databinding.CompassFragmentBinding
 import pl.pawel.compass.screen.compass.GetLocationDialog.showDialogToSelectDestination
+import pl.pawel.compass.services.LocationService
 import pl.pawel.compass.utils.PermissionUtils
 import pl.pawel.compass.utils.distanceToString
 import pl.pawel.compass.utils.haveCompassRequiredSensors
 import pl.pawel.compass.utils.registerCompassListener
 
+@AndroidEntryPoint
 class CompassFragment : Fragment() {
     private lateinit var binding: CompassFragmentBinding
     private val viewModel: CompassViewModel by viewModels()
@@ -32,11 +38,6 @@ class CompassFragment : Fragment() {
     private val compassListener: CompassListener by lazy {
         CompassListener { rotation ->
             viewModel.updateRotation(rotation)
-        }
-    }
-    private val locationListener: LocationListener by lazy {
-        LocationListener(activity as AppCompatActivity) {
-            viewModel.updateMyLocation(it)
         }
     }
 
@@ -50,6 +51,23 @@ class CompassFragment : Fragment() {
                 showSnackbarToOpenSettings()
             }
         }
+
+    private var service: LocationService? = null
+    private var bound = false
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(name: ComponentName, iBinder: IBinder) {
+            val binder: LocationService.LocationBinder =
+                iBinder as LocationService.LocationBinder
+            service = binder.service
+            bound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName) {
+            service = null
+            bound = false
+        }
+    }
+
 
     private fun showSnackbarToOpenSettings() {
         Snackbar.make(
@@ -119,11 +137,12 @@ class CompassFragment : Fragment() {
     }
 
     private fun setUpLocationListener() {
-        locationListener.startObservingLocation(
-            activity as AppCompatActivity,
-            onError = {
-                showSnackbarThatAppRequiresGpsToWork()
-            })
+        requireActivity().bindService(
+            Intent(context, LocationService::class.java),
+            serviceConnection,
+            Context.BIND_AUTO_CREATE
+        )
+        viewModel.startObservingLocation()
     }
 
     override fun onResume() {
@@ -139,8 +158,8 @@ class CompassFragment : Fragment() {
 
     override fun onPause() {
         sensorManager.unregisterListener(compassListener)
-        if (viewModel.shouldStartGettingLocalization) {
-            locationListener.stopObtainingLocation()
+        if (viewModel.shouldStartGettingLocalization && bound) {
+            requireActivity().unbindService(serviceConnection)
         }
         super.onPause()
     }

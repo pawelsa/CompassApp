@@ -1,6 +1,6 @@
 package pl.pawel.compass.utils
 
-import pl.pawel.compass.data.Location
+import pl.pawel.compass.data.model.Location
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin

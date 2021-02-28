@@ -12,4 +12,8 @@
     <string name="error_value_between">Value should be between -%1$f, %1$f</string>
     <string name="distance_left">Distance left %1$s</string>
     <string name="what_is_your_goal">What\nis your\ngoal?</string>
+    <string name="launch_activity">Open activity</string>
+    <string name="your_location">Your location</string>
+    <string name="current_location">Currently: %1$f, %2$f</string>
+    <string name="establishing_location">Establishing location</string>
 </resources>

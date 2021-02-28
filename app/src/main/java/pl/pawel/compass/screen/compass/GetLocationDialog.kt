@@ -6,7 +6,7 @@ import androidx.core.widget.doOnTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import pl.pawel.compass.R
-import pl.pawel.compass.data.Location
+import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.databinding.DialogEditTextFieldBinding
 import pl.pawel.compass.utils.isNotValid
 import pl.pawel.compass.utils.toFloat
