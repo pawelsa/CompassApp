@@ -1,6 +1,5 @@
 package pl.pawel.compass.screen.compass
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,6 +10,8 @@ import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.utils.GeographicCalculations
 import pl.pawel.compass.utils.RxBus
 import javax.inject.Inject
+
+// TODO: 01.03.2021 move more of the code to usecases etc
 
 @HiltViewModel
 class CompassViewModel @Inject constructor() : ViewModel() {
@@ -54,7 +55,6 @@ class CompassViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun updateMyLocation(location: Location) {
-        Log.d("CompassViewModel", "updateMyLocation: $location")
         myLocation = location
         updateData()
     }

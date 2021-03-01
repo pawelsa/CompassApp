@@ -62,17 +62,14 @@ class LocationService : Service() {
     }
 
     private fun setupObservingLocation() {
-        Log.d("LocationService", "setupObservingLocation: ")
         locationDisposable = locationUseCase()
-            .doOnSubscribe {
-                Log.d("LocationService", "setupObservingLocation: onSubscribe")
-            }
             .subscribe({
                 Log.d("LocationService", "setupObservingLocation: $it")
                 currentLocation = it
                 RxBus.publish(it)
             }, {
-                Log.d("LocationService", "setupObservingLocation: $it")
+                // TODO: 01.03.2021 better handle the exception
+                Log.e("LocationService", "setupObservingLocation: $it")
                 setupObservingLocation()
             })
     }
