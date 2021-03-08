@@ -76,7 +76,6 @@ class LocationService : Service() {
     private fun setupObservingLocation() {
         if (removeLocationUpdatesDisposable?.isDisposed == false) {
             removeLocationUpdatesDisposable?.dispose()
-            removeLocationUpdatesDisposable = null
         }
         locationDisposable = locationUseCase()
                 .subscribe({

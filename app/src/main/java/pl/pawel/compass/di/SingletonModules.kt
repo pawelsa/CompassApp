@@ -8,8 +8,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import pl.pawel.compass.data.repository.SensorRepository
 import pl.pawel.compass.data.repository.SensorRepositoryImpl
-import pl.pawel.compass.data.use_case.CompassUseCase
-import pl.pawel.compass.data.use_case.CompassUseCaseImpl
+import pl.pawel.compass.data.use_case.ObserveCompassAndLocationUseCase
+import pl.pawel.compass.data.use_case.ObserveCompassAndLocationUseCaseImpl
 import pl.pawel.compass.data.use_case.ObserveLocationUseCase
 import pl.pawel.compass.data.use_case.ObserveLocationUseCaseImpl
 import pl.pawel.compass.screen.compass.CompassObserver
@@ -17,7 +17,7 @@ import pl.pawel.compass.screen.compass.LocationObserver
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class) // Installs FooModule in the generate SingletonComponent.
+@InstallIn(SingletonComponent::class)
 object SingletonModules {
 
     @Singleton
@@ -41,6 +41,6 @@ object SingletonModules {
 
     @Singleton
     @Provides
-    fun provideCompassUseCase(sensorRepository: SensorRepository): CompassUseCase = CompassUseCaseImpl(sensorRepository)
+    fun provideCompassAndLocationUseCase(sensorRepository: SensorRepository): ObserveCompassAndLocationUseCase = ObserveCompassAndLocationUseCaseImpl(sensorRepository)
 
 }

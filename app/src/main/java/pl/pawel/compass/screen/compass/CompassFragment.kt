@@ -91,22 +91,22 @@ class CompassFragment : Fragment() {
         }
     }
 
-    private fun handleStateUpdate(state: CompassState) {
+    private fun handleStateUpdate(state: CompassViewModel.ScreenState) {
         return when (state) {
-            is CompassState.OnlyCompass -> updateCompassRotation(state.bearing)
-            is CompassState.CompassWithLocalizationState -> updateCompassWithLocalization(state)
+            is CompassViewModel.ScreenState.OnlyCompass -> updateCompassRotation(state.bearing)
+            is CompassViewModel.ScreenState.CompassWithLocalization -> updateCompassWithLocalization(state)
         }
     }
 
-    private fun updateCompassWithLocalization(state: CompassState.CompassWithLocalizationState) =
-        with(binding) {
-            message.text = resources.getString(
-                R.string.distance_left,
-                state.distanceToDestination.distanceToString()
-            )
-            compassView.northAngle = state.bearing
-            compassView.destinationAngle = state.bearingOfDestination
-        }
+    private fun updateCompassWithLocalization(state: CompassViewModel.ScreenState.CompassWithLocalization) =
+            with(binding) {
+                message.text = resources.getString(
+                        R.string.distance_left,
+                        state.distanceToDestination.distanceToString()
+                )
+                compassView.northAngle = state.bearing
+                compassView.destinationAngle = state.bearingOfDestination
+            }
 
     private fun updateCompassRotation(bearing: Float) = with(binding) {
         compassView.northAngle = bearing
@@ -115,7 +115,7 @@ class CompassFragment : Fragment() {
     private fun setupLocalizationIfTurnedOnOrAskToEnable() {
         if (PermissionUtils.isLocationEnabled(requireContext())) {
             setUpLocationListener()
-            showDialogToSelectDestination(layoutInflater, viewModel::updateDestination)
+            showDialogToSelectDestination(layoutInflater, viewModel::startObserving)
         } else {
             viewModel.shouldStartGettingLocalization = true
             PermissionUtils.showEnableGPSDialog(requireContext()) {
@@ -126,16 +126,16 @@ class CompassFragment : Fragment() {
 
     private fun setUpLocationListener() {
         requireActivity().bindService(
-            Intent(context, LocationService::class.java),
-            serviceConnection,
-            Context.BIND_AUTO_CREATE
+                Intent(context, LocationService::class.java),
+                serviceConnection,
+                Context.BIND_AUTO_CREATE
         )
-        viewModel.startObservingLocation()
+        viewModel.startObserving()
     }
 
     override fun onResume() {
         super.onResume()
-        viewModel.startObservingCompass()
+        viewModel.startObserving()
         if (viewModel.shouldStartGettingLocalization) {
             setupLocalizationIfTurnedOnOrAskToEnable()
         }
