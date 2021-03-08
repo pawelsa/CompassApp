@@ -7,12 +7,14 @@ import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
+import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
 import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.data.use_case.ObserveLocationUseCase
 import pl.pawel.compass.utils.NotificationUtil.createLocationChannel
 import pl.pawel.compass.utils.NotificationUtil.startLocationForeground
 import pl.pawel.compass.utils.RxBus
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
@@ -27,6 +29,7 @@ class LocationService : Service() {
     }
     private var currentLocation: Location? = null
     private var locationDisposable: Disposable? = null
+    private var removeLocationUpdatesDisposable: Disposable? = null
 
     override fun onBind(intent: Intent?): IBinder {
         setupOnBind()
@@ -48,6 +51,15 @@ class LocationService : Service() {
         if (!changingConfiguration && locationDisposable?.isDisposed == false) {
             startLocationForeground(currentLocation)
         }
+        removeLocationUpdatesDisposable = Single.timer(10, TimeUnit.SECONDS)
+                .subscribe(
+                        {
+                            locationDisposable?.dispose()
+                        },
+                        {
+                            // TODO: 3/8/21 handle exception
+                        },
+                )
         return true
     }
 
@@ -62,16 +74,20 @@ class LocationService : Service() {
     }
 
     private fun setupObservingLocation() {
+        if (removeLocationUpdatesDisposable?.isDisposed == false) {
+            removeLocationUpdatesDisposable?.dispose()
+            removeLocationUpdatesDisposable = null
+        }
         locationDisposable = locationUseCase()
-            .subscribe({
-                Log.d("LocationService", "setupObservingLocation: $it")
-                currentLocation = it
-                RxBus.publish(it)
-            }, {
-                // TODO: 01.03.2021 better handle the exception
-                Log.e("LocationService", "setupObservingLocation: $it")
-                setupObservingLocation()
-            })
+                .subscribe({
+                    Log.d("LocationService", "setupObservingLocation: $it")
+                    currentLocation = it
+                    RxBus.publish(it)
+                }, {
+                    // TODO: 01.03.2021 better handle the exception
+                    Log.e("LocationService", "setupObservingLocation: $it")
+                    setupObservingLocation()
+                })
     }
 
     override fun onDestroy() {

@@ -28,33 +28,35 @@ class LocationObserver @Inject constructor(
         .setFastestInterval(FAST_INTERVAL)
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
     private val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            locationResult.locations.forEach(::updateLocation)
+        override fun onLocationResult(locationResult: LocationResult?) {
+            locationResult?.locations?.forEach(::updateLocation)
         }
     }
 
     val locationObservable: Flowable<Location> =
-        locationSubject.toFlowable(BackpressureStrategy.LATEST)
-            .observeOn(Schedulers.io())
-            .doOnSubscribe { startObtainingLocalization() }
-            .doOnCancel { stopObtainingLocation() }
+            locationSubject.toFlowable(BackpressureStrategy.LATEST)
+                    .observeOn(Schedulers.io())
+                    .doOnSubscribe { startObtainingLocalization() }
+                    .doOnCancel { stopObtainingLocation() }
 
     companion object {
         private const val NORMAL_INTERVAL = 5000L
         private const val FAST_INTERVAL = 2000L
     }
 
-    private fun updateLocation(location: android.location.Location) {
-        locationSubject.onNext(location.toAppLocation())
+    private fun updateLocation(location: android.location.Location?) {
+        location?.let {
+            locationSubject.onNext(it.toAppLocation())
+        }
     }
 
     @SuppressLint("MissingPermission")
     private fun startObtainingLocalization() {
         fusedLocationProviderClient.lastLocation.addOnSuccessListener(::updateLocation)
         fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.myLooper()
+                locationRequest,
+                locationCallback,
+                Looper.myLooper()
         )
     }
 

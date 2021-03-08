@@ -9,7 +9,7 @@ interface ObserveLocationUseCase {
     operator fun invoke(): Flowable<Location>
 }
 
-class ObserveLocationUseCaseImpl @Inject constructor(val locationRepository: LocationRepository) :
-    ObserveLocationUseCase {
+class ObserveLocationUseCaseImpl @Inject constructor(private val locationRepository: LocationRepository) :
+        ObserveLocationUseCase {
     override fun invoke(): Flowable<Location> = locationRepository.obtainLocation()
 }
