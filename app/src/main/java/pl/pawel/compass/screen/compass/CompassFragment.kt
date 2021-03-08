@@ -19,7 +19,8 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import pl.pawel.compass.R
 import pl.pawel.compass.databinding.CompassFragmentBinding
-import pl.pawel.compass.screen.compass.GetLocationDialog.showDialogToSelectDestination
+import pl.pawel.compass.dialogs.EnableGpsDialog.showEnableGPSDialog
+import pl.pawel.compass.dialogs.GetLocationDialog.showDialogToSelectDestination
 import pl.pawel.compass.services.LocationService
 import pl.pawel.compass.utils.PermissionUtils
 import pl.pawel.compass.utils.distanceToString
@@ -118,7 +119,7 @@ class CompassFragment : Fragment() {
             showDialogToSelectDestination(layoutInflater, viewModel::startObserving)
         } else {
             viewModel.shouldStartGettingLocalization = true
-            PermissionUtils.showEnableGPSDialog(requireContext()) {
+            showEnableGPSDialog(requireContext()) {
                 viewModel.shouldStartGettingLocalization = false
             }
         }

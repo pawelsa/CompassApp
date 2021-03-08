@@ -12,8 +12,8 @@ import pl.pawel.compass.data.use_case.ObserveCompassAndLocationUseCase
 import pl.pawel.compass.data.use_case.ObserveCompassAndLocationUseCaseImpl
 import pl.pawel.compass.data.use_case.ObserveLocationUseCase
 import pl.pawel.compass.data.use_case.ObserveLocationUseCaseImpl
-import pl.pawel.compass.screen.compass.CompassObserver
-import pl.pawel.compass.screen.compass.LocationObserver
+import pl.pawel.compass.sensors.CompassObserver
+import pl.pawel.compass.sensors.LocationObserver
 import javax.inject.Singleton
 
 @Module

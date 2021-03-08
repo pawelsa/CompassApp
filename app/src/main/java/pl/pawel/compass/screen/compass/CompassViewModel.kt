@@ -14,6 +14,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CompassViewModel @Inject constructor(private val observeCompassAndLocationUseCase: ObserveCompassAndLocationUseCase) : ViewModel() {
     var shouldStartGettingLocalization: Boolean = false
+
+    // TODO: 3/8/21 check if can be done with observable delegate
     private var destination: Location? = null
 
     private val _state = MutableLiveData<ScreenState>()

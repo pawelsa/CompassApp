@@ -2,8 +2,8 @@ package pl.pawel.compass.data.repository
 
 import io.reactivex.rxjava3.core.Flowable
 import pl.pawel.compass.data.model.Location
-import pl.pawel.compass.screen.compass.CompassObserver
-import pl.pawel.compass.screen.compass.LocationObserver
+import pl.pawel.compass.sensors.CompassObserver
+import pl.pawel.compass.sensors.LocationObserver
 import javax.inject.Inject
 
 interface SensorRepository {

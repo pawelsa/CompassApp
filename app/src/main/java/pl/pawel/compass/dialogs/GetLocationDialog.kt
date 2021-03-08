@@ -1,4 +1,4 @@
-package pl.pawel.compass.screen.compass
+package pl.pawel.compass.dialogs
 
 import android.content.DialogInterface
 import android.view.LayoutInflater

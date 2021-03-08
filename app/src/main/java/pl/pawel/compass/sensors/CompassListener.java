@@ -1,4 +1,4 @@
-package pl.pawel.compass.screen.compass;
+package pl.pawel.compass.sensors;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
