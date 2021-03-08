@@ -5,7 +5,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
@@ -14,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
@@ -25,21 +23,11 @@ import pl.pawel.compass.screen.compass.GetLocationDialog.showDialogToSelectDesti
 import pl.pawel.compass.services.LocationService
 import pl.pawel.compass.utils.PermissionUtils
 import pl.pawel.compass.utils.distanceToString
-import pl.pawel.compass.utils.haveCompassRequiredSensors
-import pl.pawel.compass.utils.registerCompassListener
 
 @AndroidEntryPoint
 class CompassFragment : Fragment() {
     private lateinit var binding: CompassFragmentBinding
     private val viewModel: CompassViewModel by viewModels()
-    private val sensorManager: SensorManager by lazy {
-        getSystemService(requireContext(), SensorManager::class.java) as SensorManager
-    }
-    private val compassListener: CompassListener by lazy {
-        CompassListener { rotation ->
-            viewModel.updateRotation(rotation)
-        }
-    }
 
     private val requestPermissionLauncher =
         registerForActivityResult(
@@ -92,7 +80,7 @@ class CompassFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.state.observe(viewLifecycleOwner, { handleStateUpdate(it) })
+        viewModel.state.observe(viewLifecycleOwner, this::handleStateUpdate)
 
         binding.message.setOnClickListener {
             if (PermissionUtils.isAccessFineLocationGranted(requireContext())) {
@@ -147,9 +135,7 @@ class CompassFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (sensorManager.haveCompassRequiredSensors()) {
-            sensorManager.registerCompassListener(compassListener)
-        }
+        viewModel.startObservingCompass()
         if (viewModel.shouldStartGettingLocalization) {
             setupLocalizationIfTurnedOnOrAskToEnable()
         }
@@ -157,7 +143,7 @@ class CompassFragment : Fragment() {
 
 
     override fun onPause() {
-        sensorManager.unregisterListener(compassListener)
+        viewModel.stopObserving()
         if (viewModel.shouldStartGettingLocalization && bound) {
             requireActivity().unbindService(serviceConnection)
         }
