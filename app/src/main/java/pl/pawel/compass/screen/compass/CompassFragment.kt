@@ -131,12 +131,4 @@ class CompassFragment : BaseFragmentWithService<LocationService>() {
         super.onPause()
     }
 
-    private fun showSnackbarThatAppRequiresGpsToWork() {
-        Snackbar.make(
-            requireView(),
-            getString(R.string.required_for_this_app),
-            Snackbar.LENGTH_LONG
-        ).show()
-    }
-
 }
