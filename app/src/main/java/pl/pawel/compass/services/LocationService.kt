@@ -3,12 +3,12 @@ package pl.pawel.compass.services
 import android.app.*
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Binder
 import android.os.IBinder
 import android.util.Log
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.Disposable
+import pl.pawel.compass.base.BaseService
 import pl.pawel.compass.data.model.Location
 import pl.pawel.compass.data.use_case.ObserveLocationUseCase
 import pl.pawel.compass.utils.NotificationUtil.createLocationChannel
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class LocationService : Service() {
+class LocationService : BaseService() {
     @Inject
     lateinit var locationUseCase: ObserveLocationUseCase
     private val binder = LocationBinder()
@@ -98,7 +98,7 @@ class LocationService : Service() {
         locationDisposable?.dispose()
     }
 
-    inner class LocationBinder : Binder() {
-        val service: LocationService = this@LocationService
+    inner class LocationBinder : BaseBinder() {
+        override val service: LocationService = this@LocationService
     }
 }
